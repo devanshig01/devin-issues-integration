@@ -1,0 +1,29 @@
+import httpx
+
+from app.config import settings
+
+DEVIN_API_BASE = "https://api.devin.ai/v1"
+
+
+async def create_session(prompt: str) -> dict:
+    url = f"{DEVIN_API_BASE}/sessions"
+    headers = {
+        "Authorization": f"Bearer {settings.devin_api_token}",
+        "Content-Type": "application/json",
+    }
+    payload = {"prompt": prompt}
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        resp = await client.post(url, headers=headers, json=payload)
+        resp.raise_for_status()
+        return resp.json()
+
+
+async def get_session(session_id: str) -> dict:
+    url = f"{DEVIN_API_BASE}/session/{session_id}"
+    headers = {
+        "Authorization": f"Bearer {settings.devin_api_token}",
+    }
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.get(url, headers=headers)
+        resp.raise_for_status()
+        return resp.json()
