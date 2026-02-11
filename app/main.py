@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.database import init_db
 from app.routers import issues, sessions
@@ -26,6 +27,11 @@ app.add_middleware(
 
 app.include_router(issues.router)
 app.include_router(sessions.router)
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/healthz")
