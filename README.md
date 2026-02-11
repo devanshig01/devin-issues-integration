@@ -12,21 +12,27 @@ A minimal app that orchestrates [Devin](https://devin.ai) sessions to scope and 
 ## Prerequisites
 
 - Python 3.12+
-- [Poetry](https://python-poetry.org/docs/#installation)
 - A GitHub personal access token
 - A Devin API token ([docs](https://docs.devin.ai))
 
 ## Setup
 
-1. **Clone and install dependencies:**
+1. **Clone the repo:**
 
    ```bash
-   git clone <repo-url>
-   cd devin-github-issues-app
-   poetry install
+   git clone https://github.com/devanshig01/devin-issues-integration.git
+   cd devin-issues-integration
    ```
 
-2. **Configure environment variables:**
+2. **Create a virtual environment and install dependencies:**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate    # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment variables:**
 
    ```bash
    cp .env.example .env
@@ -48,7 +54,7 @@ A minimal app that orchestrates [Devin](https://devin.ai) sessions to scope and 
 ### Start the API server
 
 ```bash
-poetry run fastapi dev app/main.py
+fastapi dev app/main.py
 ```
 
 The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
@@ -71,22 +77,22 @@ Run commands while the API server is running:
 
 ```bash
 # List open issues
-poetry run devin-issues list-issues
+python -m cli.main list-issues
 
 # List issues with a specific state
-poetry run devin-issues list-issues --state closed
+python -m cli.main list-issues --state closed
 
 # Scope an issue (creates a Devin session to analyze and plan)
-poetry run devin-issues scope 42
+python -m cli.main scope 42
 
 # Check session status and retrieve results
-poetry run devin-issues refresh 1
+python -m cli.main refresh 1
 
 # Implement from a scoped session (creates a Devin session to code + open PR)
-poetry run devin-issues implement 1
+python -m cli.main implement 1
 
 # List all sessions
-poetry run devin-issues sessions
+python -m cli.main sessions
 ```
 
 ## Workflow
@@ -99,9 +105,9 @@ poetry run devin-issues sessions
 ## Project Structure
 
 ```
-devin-github-issues-app/
+devin-issues-integration/
 ├── app/
-│   ├── main.py           # FastAPI application entry point
+│   ├── main.py            # FastAPI application entry point
 │   ├── config.py          # Environment-based configuration
 │   ├── database.py        # SQLite + SQLAlchemy async setup
 │   ├── models.py          # SQLAlchemy ORM models
@@ -115,6 +121,7 @@ devin-github-issues-app/
 ├── cli/
 │   └── main.py            # Typer CLI application
 ├── .env.example           # Environment variable template
-├── pyproject.toml         # Project config and dependencies
+├── requirements.txt       # Python dependencies (pip install -r requirements.txt)
+├── pyproject.toml         # Project metadata
 └── README.md
 ```
