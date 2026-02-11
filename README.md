@@ -11,7 +11,7 @@ A minimal app that orchestrates [Devin](https://devin.ai) sessions to scope and 
 
 ## Prerequisites
 
-- Python 3.12+
+- Python 3.9+
 - A GitHub personal access token
 - A Devin API token ([docs](https://docs.devin.ai))
 

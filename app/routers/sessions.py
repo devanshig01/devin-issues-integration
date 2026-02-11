@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +13,7 @@ from app.services import devin, github
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
 
-@router.get("", response_model=list[SessionResponse])
+@router.get("", response_model=List[SessionResponse])
 async def list_sessions(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(DevinSession).order_by(DevinSession.created_at.desc())

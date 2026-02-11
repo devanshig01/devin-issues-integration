@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import GitHubIssue
@@ -6,7 +8,7 @@ from app.services import github
 router = APIRouter(prefix="/issues", tags=["issues"])
 
 
-@router.get("", response_model=list[GitHubIssue])
+@router.get("", response_model=List[GitHubIssue])
 async def list_issues(state: str = "open"):
     try:
         raw_issues = await github.list_issues(state=state)

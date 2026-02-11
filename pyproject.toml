@@ -7,7 +7,7 @@ authors = ["Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.c
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.9"
 fastapi = {extras = ["standard"], version = "^0.128.4"}
 sqlalchemy = "^2.0.46"
 aiosqlite = "^0.22.1"

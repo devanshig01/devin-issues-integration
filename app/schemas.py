@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -7,9 +8,9 @@ class GitHubIssue(BaseModel):
     number: int
     title: str
     state: str
-    body: str | None = None
+    body: Optional[str] = None
     html_url: str
-    labels: list[str] = []
+    labels: List[str] = []
     created_at: str
     updated_at: str
 
@@ -27,12 +28,12 @@ class SessionResponse(BaseModel):
     issue_number: int
     issue_title: str
     session_type: str
-    devin_session_id: str | None = None
-    devin_session_url: str | None = None
+    devin_session_id: Optional[str] = None
+    devin_session_url: Optional[str] = None
     status: str
-    plan: str | None = None
-    confidence: str | None = None
-    pr_url: str | None = None
+    plan: Optional[str] = None
+    confidence: Optional[str] = None
+    pr_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

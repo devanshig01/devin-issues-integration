@@ -60,7 +60,7 @@ def _status_style(status: str) -> str:
     return mapping.get(status, "value")
 
 
-def _confidence_style(confidence: str | None) -> str:
+def _confidence_style(confidence: "Optional[str]") -> str:
     if not confidence:
         return "muted"
     mapping = {
@@ -88,7 +88,7 @@ def _handle_request_error(exc: Exception) -> None:
     if isinstance(exc, httpx.ConnectError):
         _error_panel(
             "Cannot connect to the API server.",
-            "Make sure it's running: poetry run fastapi dev app/main.py",
+            "Make sure it's running: fastapi dev app/main.py",
         )
     elif isinstance(exc, httpx.HTTPStatusError):
         detail = ""

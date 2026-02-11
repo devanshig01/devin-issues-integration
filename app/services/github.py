@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import httpx
 
 from app.config import settings
@@ -5,7 +7,7 @@ from app.config import settings
 GITHUB_API_BASE = "https://api.github.com"
 
 
-async def list_issues(state: str = "open") -> list[dict]:
+async def list_issues(state: str = "open") -> List[Dict[str, Any]]:
     owner, repo = settings.github_repo.split("/")
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/issues"
     headers = {
@@ -20,7 +22,7 @@ async def list_issues(state: str = "open") -> list[dict]:
         return resp.json()
 
 
-async def get_issue(issue_number: int) -> dict:
+async def get_issue(issue_number: int) -> Dict[str, Any]:
     owner, repo = settings.github_repo.split("/")
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/issues/{issue_number}"
     headers = {

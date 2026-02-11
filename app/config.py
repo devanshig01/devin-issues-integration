@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     github_token: str = ""
     github_repo: str = ""
     devin_api_token: str = ""
-    database_url: str = "sqlite+aiosqlite:////data/app.db"
+    database_url: str = "sqlite+aiosqlite:///./app.db"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
 

@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import httpx
 
 from app.config import settings
@@ -5,7 +7,7 @@ from app.config import settings
 DEVIN_API_BASE = "https://api.devin.ai/v1"
 
 
-async def create_session(prompt: str) -> dict:
+async def create_session(prompt: str) -> Dict[str, Any]:
     url = f"{DEVIN_API_BASE}/sessions"
     headers = {
         "Authorization": f"Bearer {settings.devin_api_token}",
@@ -18,7 +20,7 @@ async def create_session(prompt: str) -> dict:
         return resp.json()
 
 
-async def get_session(session_id: str) -> dict:
+async def get_session(session_id: str) -> Dict[str, Any]:
     url = f"{DEVIN_API_BASE}/session/{session_id}"
     headers = {
         "Authorization": f"Bearer {settings.devin_api_token}",
