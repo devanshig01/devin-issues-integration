@@ -1,11 +1,15 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.database import init_db
 from app.routers import issues, sessions
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 
 @asynccontextmanager
@@ -28,10 +32,18 @@ app.add_middleware(
 app.include_router(issues.router)
 app.include_router(sessions.router)
 
+# Frontend: serve static assets
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
 
 @app.get("/", include_in_schema=False)
 async def root():
-    return RedirectResponse(url="/docs")
+    """Serve the frontend dashboard."""
+    index_path = STATIC_DIR / "index.html"
+    if not index_path.exists():
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/docs")
+    return FileResponse(index_path)
 
 
 @app.get("/healthz")
