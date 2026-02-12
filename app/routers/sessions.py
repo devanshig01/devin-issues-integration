@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import List
+import re
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -15,6 +16,28 @@ from app.schemas import ImplementRequest, ScopeRequest, SessionResponse
 from app.services import devin, github
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
+
+_CONFIDENCE_RE = re.compile(
+    r"(?:confidence\s*(?:level|score)?[\s:]*)(high|medium|low)",
+    re.IGNORECASE,
+)
+
+
+def _extract_confidence_from_text(text: str) -> Optional[str]:
+    if not text:
+        return None
+    try:
+        data = json.loads(text)
+        if isinstance(data, dict):
+            val = data.get("confidence", "")
+            if val and val.strip().lower() in ("high", "medium", "low"):
+                return val.strip().lower()
+    except (json.JSONDecodeError, ValueError):
+        pass
+    m = _CONFIDENCE_RE.search(text)
+    if m:
+        return m.group(1).lower()
+    return None
 
 
 @router.get("", response_model=List[SessionResponse])
@@ -223,13 +246,27 @@ async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
             if pr_val:
                 db_session.pr_url = pr_val
 
+        messages = devin_data.get("messages", [])
+
         if not db_session.plan:
-            messages = devin_data.get("messages", [])
             if len(messages) >= 2:
                 for msg in reversed(messages[1:]):
                     text = msg.get("message", "") or msg.get("content", "") or msg.get("text", "")
                     if text.strip():
                         db_session.plan = text.strip()
+                        break
+
+        if not db_session.confidence:
+            if db_session.plan:
+                extracted = _extract_confidence_from_text(db_session.plan)
+                if extracted:
+                    db_session.confidence = extracted
+            if not db_session.confidence and len(messages) >= 2:
+                for msg in reversed(messages[1:]):
+                    text = msg.get("message", "") or msg.get("content", "") or msg.get("text", "")
+                    extracted = _extract_confidence_from_text(text)
+                    if extracted:
+                        db_session.confidence = extracted
                         break
 
         pr_info = devin_data.get("pull_request")
