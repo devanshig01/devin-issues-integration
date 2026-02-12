@@ -14,19 +14,36 @@
     <header class="header">
       <div class="header-inner">
         <h1 class="logo">Devin × GitHub Issues</h1>
-        <nav class="nav">
-          <button type="button" class="nav-btn active" data-tab="issues">Issues</button>
-          <button type="button" class="nav-btn" data-tab="sessions">Sessions</button>
-          <button type="button" class="nav-btn" data-tab="implementations">Implementations</button>
-        </nav>
         <a href="/docs" class="api-docs" target="_blank" rel="noopener">API Docs</a>
       </div>
     </header>
 
+    <div class="workflow-bar">
+      <div class="workflow-inner">
+        <div class="workflow-step active" data-step="1">
+          <span class="step-number">1</span>
+          <span class="step-label">Scope</span>
+          <span class="step-desc">Pick an issue for Devin to analyze</span>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step" data-step="2">
+          <span class="step-number">2</span>
+          <span class="step-label">Refresh</span>
+          <span class="step-desc">Retrieve the plan &amp; confidence</span>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step" data-step="3">
+          <span class="step-number">3</span>
+          <span class="step-label">Implement</span>
+          <span class="step-desc">Devin codes the plan &amp; opens a PR</span>
+        </div>
+      </div>
+    </div>
+
     <main class="main">
-      <section id="issues-panel" class="panel active">
+      <section id="step1-panel" class="panel active" data-step="1">
         <div class="panel-header">
-          <h2>GitHub Issues</h2>
+          <h2>Step 1 — Pick an Issue to Scope</h2>
           <div class="issues-controls">
             <div class="state-toggle">
               <button type="button" class="toggle-btn active" data-state="open">Open</button>
@@ -35,30 +52,40 @@
             <button type="button" class="btn btn-secondary" id="refresh-issues">Refresh</button>
           </div>
         </div>
+        <p class="panel-hint">Select an issue below and click <strong>Scope with Devin</strong> to create an analysis session.</p>
         <div id="issues-loading" class="loading">Loading issues…</div>
         <div id="issues-error" class="error hidden"></div>
         <div id="issues-list" class="issues-list hidden"></div>
       </section>
 
-      <section id="sessions-panel" class="panel">
+      <section id="step2-panel" class="panel" data-step="2">
         <div class="panel-header">
-          <h2>Devin Sessions</h2>
-          <button type="button" class="btn btn-secondary" id="refresh-sessions">Refresh</button>
+          <h2>Step 2 — Refresh &amp; Review Plans</h2>
+          <button type="button" class="btn btn-secondary" id="refresh-sessions">Refresh All</button>
         </div>
+        <p class="panel-hint">Click <strong>Refresh</strong> on a running session to fetch the plan and confidence score from Devin. Once ready, click <strong>Implement</strong>.</p>
         <div id="sessions-loading" class="loading hidden">Loading sessions…</div>
         <div id="sessions-error" class="error hidden"></div>
         <div id="sessions-list" class="sessions-list hidden"></div>
+        <div id="sessions-empty" class="empty-state hidden">
+          <p>No scope sessions yet.</p>
+          <button type="button" class="btn btn-primary go-step1-btn">Go to Step 1 — Scope an Issue</button>
+        </div>
       </section>
 
-      <section id="implementations-panel" class="panel">
+      <section id="step3-panel" class="panel" data-step="3">
         <div class="panel-header">
-          <h2>Implementations</h2>
-          <p class="panel-desc">Sessions where the plan has been implemented (PR created or in progress).</p>
-          <button type="button" class="btn btn-secondary" id="refresh-implementations">Refresh</button>
+          <h2>Step 3 — Implementations &amp; PRs</h2>
+          <button type="button" class="btn btn-secondary" id="refresh-implementations">Refresh All</button>
         </div>
+        <p class="panel-hint">Devin is writing code and will open a PR. Click <strong>Refresh</strong> to check progress.</p>
         <div id="implementations-loading" class="loading hidden">Loading…</div>
         <div id="implementations-error" class="error hidden"></div>
         <div id="implementations-list" class="sessions-list hidden"></div>
+        <div id="implementations-empty" class="empty-state hidden">
+          <p>No implementations yet.</p>
+          <button type="button" class="btn btn-primary go-step2-btn">Go to Step 2 — Review a Plan</button>
+        </div>
       </section>
     </main>
   </div>
@@ -67,18 +94,18 @@
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="implement-plan-modal-title">Implementation plan</h3>
+        <h3 id="implement-plan-modal-title">Review Plan &amp; Implement</h3>
         <button type="button" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
         <p id="implement-plan-modal-subtitle" class="modal-subtitle"></p>
         <p id="implement-plan-modal-confidence" class="modal-confidence hidden"></p>
         <div id="implement-plan-modal-plan" class="implement-plan-text"></div>
-        <p id="implement-plan-modal-no-plan" class="implement-plan-empty hidden">No plan available yet. Use Refresh on the scope session to fetch the plan from Devin.</p>
+        <p id="implement-plan-modal-no-plan" class="implement-plan-empty hidden">No plan available yet. Go back and Refresh the scope session first.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="implement-plan-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="implement-plan-confirm">Start implementation</button>
+        <button type="button" class="btn btn-primary" id="implement-plan-confirm">Start Implementation with Devin</button>
       </div>
     </div>
   </div>

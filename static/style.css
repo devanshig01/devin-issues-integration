@@ -98,6 +98,99 @@ body {
   color: var(--accent);
 }
 
+/* Workflow bar */
+.workflow-bar {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.workflow-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+}
+
+.workflow-step:hover {
+  background: var(--surface-hover);
+}
+
+.workflow-step.active {
+  background: rgba(34, 211, 238, 0.08);
+  border-color: var(--accent);
+}
+
+.workflow-step.done {
+  opacity: 0.7;
+}
+
+.workflow-step.done .step-number {
+  background: var(--success);
+  color: var(--bg);
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+}
+
+.workflow-step.active .step-number {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.step-label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.workflow-step.active .step-label {
+  color: var(--text);
+}
+
+.step-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .step-desc {
+    display: inline;
+  }
+}
+
+.workflow-arrow {
+  color: var(--border);
+  font-size: 1.25rem;
+  padding: 0 0.25rem;
+  user-select: none;
+}
+
 /* Main */
 .main {
   flex: 1;
@@ -131,12 +224,56 @@ body {
   color: var(--text-muted);
 }
 
-.panel-desc {
+.panel-hint {
   font-size: 0.875rem;
   color: var(--text-muted);
-  margin: 0;
-  flex: 1 1 100%;
-  order: 3;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.6;
+}
+
+.panel-hint strong {
+  color: var(--accent);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+  font-size: 0.9375rem;
+}
+
+.empty-state-text {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.status-hint {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--warning);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.status-hint-ready {
+  color: var(--success);
+}
+
+.session-card--ready {
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.session-card--has-pr {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.pr-link-block {
+  margin-top: 0.75rem;
 }
 
 .issues-controls {
