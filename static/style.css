@@ -436,9 +436,14 @@ body {
 }
 
 .issue-title {
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 0.35rem 0;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.issue-title-text {
+  color: var(--text);
 }
 
 .issue-meta {
@@ -507,9 +512,25 @@ body {
 }
 
 .session-title {
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 0.25rem 0;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.session-title-number {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(34, 211, 238, 0.12);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  margin-right: 0.25rem;
+}
+
+.session-title-text {
+  color: var(--text);
 }
 
 .session-meta {
@@ -954,6 +975,42 @@ body {
 .issue-card.issue-card--pinned {
   border-color: rgba(251, 191, 36, 0.35);
   background: rgba(251, 191, 36, 0.04);
+}
+
+/* Confidence display */
+.confidence-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(34, 211, 238, 0.06);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.confidence-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.confidence-value {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.confidence-high {
+  color: var(--success);
+}
+
+.confidence-medium {
+  color: var(--warning);
+}
+
+.confidence-low {
+  color: var(--danger);
 }
 
 .pinned-label {

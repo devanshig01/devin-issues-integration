@@ -151,7 +151,7 @@ function renderIssues() {
           <span class="issue-number-badge">#${issue.number}</span>
           ${isPinned ? '<span class="pinned-label">Priority</span>' : ""}
         </div>
-        <h3 class="issue-title">${escapeHtml(issue.title)}</h3>
+        <h3 class="issue-title"><span class="issue-title-text">${escapeHtml(issue.title)}</span></h3>
         <div class="issue-meta">
           <a href="${escapeHtml(issue.html_url)}" target="_blank" rel="noopener">View on GitHub</a>
           · ${formatDate(issue.created_at)}
@@ -253,13 +253,13 @@ function renderSessions(scopeSessions) {
     <div class="session-card ${isCompleted && hasPlan ? "session-card--ready" : ""}" data-session-id="${s.id}">
       <div class="session-row">
         <div class="session-info">
-          <h3 class="session-title">#${s.issue_number} ${escapeHtml(s.issue_title)}</h3>
+          <h3 class="session-title"><span class="session-title-number">#${s.issue_number}</span> <span class="session-title-text">${escapeHtml(s.issue_title)}</span></h3>
           <div class="session-meta">Session ${s.id} · ${formatDate(s.created_at)}</div>
           <div class="session-badges">
             <span class="badge badge-type">scope</span>
             <span class="badge badge-status ${(s.status || "").toLowerCase()}">${escapeHtml(s.status)}</span>
-            ${hasConfidence ? `<span class="badge badge-confidence">${escapeHtml(s.confidence)}</span>` : ""}
           </div>
+          ${hasConfidence ? `<div class="confidence-display"><span class="confidence-label">Confidence:</span> <span class="confidence-value confidence-${escapeHtml(s.confidence).toLowerCase()}">${escapeHtml(s.confidence)}</span></div>` : ""}
           ${statusHint}
           <div class="devin-output-block">
             <div class="devin-output-header">Devin Analysis</div>
@@ -436,7 +436,7 @@ function renderImplementations(implementations) {
     <div class="session-card ${hasPR ? "session-card--has-pr" : ""}" data-session-id="${s.id}">
       <div class="session-row">
         <div class="session-info">
-          <h3 class="session-title">#${s.issue_number} ${escapeHtml(s.issue_title)}</h3>
+          <h3 class="session-title"><span class="session-title-number">#${s.issue_number}</span> <span class="session-title-text">${escapeHtml(s.issue_title)}</span></h3>
           <div class="session-meta">Session ${s.id} · ${formatDate(s.created_at)}</div>
           <div class="session-badges">
             <span class="badge badge-type">implement</span>
