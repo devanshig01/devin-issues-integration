@@ -2,7 +2,7 @@
 name = "devin-issues-integration"
 version = "0.1.0"
 description = "Minimal GitHub Issues Integration app that orchestrates Devin sessions"
-packages = [{include = "app"}, {include = "cli"}]
+packages = [{include = "app"}]
 authors = ["Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>"]
 readme = "README.md"
 
@@ -13,11 +13,6 @@ sqlalchemy = "^2.0.46"
 aiosqlite = "^0.22.1"
 httpx = "^0.28.1"
 pydantic-settings = "^2.12.0"
-typer = "^0.21.1"
-rich = "^14.3.2"
-
-[tool.poetry.scripts]
-devin-issues = "cli.main:cli"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,6 +1,6 @@
 # GitHub Issues Integration with Devin
 
-A minimal app that orchestrates [Devin](https://devin.ai) sessions to scope and implement GitHub issues. Built with **FastAPI** (backend) and **Typer** (CLI).
+A minimal app that orchestrates [Devin](https://devin.ai) sessions to scope and implement GitHub issues. Built with **FastAPI** and a web dashboard.
 
 ## Features
 
@@ -71,29 +71,13 @@ The API will be available at `http://localhost:8000`. Interactive docs at `http:
 | POST   | `/sessions/{id}/refresh`      | Refresh session status from Devin    |
 | GET    | `/healthz`                    | Health check                         |
 
-### CLI Commands
+### Dashboard
 
-Run commands while the API server is running:
+Open `http://localhost:8000` in your browser to use the web dashboard. It provides a 3-step workflow:
 
-```bash
-# List open issues
-python -m cli.main list-issues
-
-# List issues with a specific state
-python -m cli.main list-issues --state closed
-
-# Scope an issue (creates a Devin session to analyze and plan)
-python -m cli.main scope 42
-
-# Check session status and retrieve results
-python -m cli.main refresh 1
-
-# Implement from a scoped session (creates a Devin session to code + open PR)
-python -m cli.main implement 1
-
-# List all sessions
-python -m cli.main sessions
-```
+1. **Browse Issues** — View and filter GitHub issues
+2. **Retrieve Plans** — See scope session results with confidence scores
+3. **Track Implementations** — Monitor implementation sessions and PRs
 
 ## Workflow
 
@@ -118,8 +102,9 @@ devin-issues-integration/
 │   └── services/
 │       ├── github.py      # GitHub API client
 │       └── devin.py       # Devin API client
-├── cli/
-│   └── main.py            # Typer CLI application
+├── static/
+│   ├── app.js             # Dashboard frontend logic
+│   └── style.css          # Dashboard styles
 ├── .env.example           # Environment variable template
 ├── requirements.txt       # Python dependencies (pip install -r requirements.txt)
 ├── pyproject.toml         # Project metadata
