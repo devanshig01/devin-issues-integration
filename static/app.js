@@ -242,11 +242,8 @@ function renderSessions(scopeSessions) {
       else if (hasPlan) statusHint = '<span class="status-hint status-hint-ready">Plan ready — click Implement to proceed</span>';
       else if (isCompleted && !hasPlan) statusHint = '<span class="status-hint">Devin finished but plan not extracted yet. Click Refresh to try again.</span>';
 
-      const outputContent = hasPlan || hasConfidence
-        ? `
-          ${hasConfidence ? `<div class="devin-output-confidence"><span class="devin-output-label">Confidence:</span> <strong>${escapeHtml(s.confidence)}</strong></div>` : ""}
-          ${hasPlan ? renderPlanBlock(s.plan) : ""}
-        `
+      const outputContent = hasPlan
+        ? renderPlanBlock(s.plan)
         : '<p class="devin-output-empty">No output yet. Click <strong>Refresh</strong> to fetch the plan from Devin.</p>';
 
       return `
