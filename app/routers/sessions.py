@@ -1,8 +1,12 @@
+import json
+import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.config import settings
 from app.database import get_db
@@ -155,24 +159,49 @@ async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
 
     try:
         devin_data = await devin.get_session(db_session.devin_session_id)
-        db_session.status = devin_data.get("status_enum", db_session.status)
+        logger.info("Devin API response keys: %s", list(devin_data.keys()))
+        logger.info("Devin status_enum: %s", devin_data.get("status_enum"))
+        logger.info("Devin structured_output type: %s, value: %s",
+                     type(devin_data.get("structured_output")).__name__,
+                     repr(devin_data.get("structured_output"))[:500])
+
+        status = devin_data.get("status_enum", db_session.status)
+        if status == "blocked" and db_session.session_type == "scope":
+            db_session.status = "finished"
+        elif status == "finished":
+            db_session.status = "finished"
+        else:
+            db_session.status = status
 
         structured = devin_data.get("structured_output")
-        if structured:
-            if isinstance(structured, dict):
-                db_session.plan = structured.get("plan", db_session.plan)
-                db_session.confidence = structured.get(
-                    "confidence", db_session.confidence
-                )
-                db_session.pr_url = structured.get("pr_url", db_session.pr_url)
-            elif isinstance(structured, str):
+        if structured and isinstance(structured, str):
+            try:
+                structured = json.loads(structured)
+            except (json.JSONDecodeError, ValueError):
                 db_session.plan = structured
+                structured = None
+        if structured and isinstance(structured, dict):
+            plan_val = structured.get("plan", "")
+            if plan_val:
+                db_session.plan = plan_val
+            conf_val = structured.get("confidence", "")
+            if conf_val:
+                db_session.confidence = conf_val
+            pr_val = structured.get("pr_url", "")
+            if pr_val:
+                db_session.pr_url = pr_val
 
         if not db_session.plan:
             messages = devin_data.get("messages", [])
+            logger.info("Messages count: %d", len(messages))
+            if messages:
+                logger.info("Last message keys: %s", list(messages[-1].keys()) if messages[-1] else "empty")
+                logger.info("Last message role: %s", messages[-1].get("role", "N/A"))
             for msg in reversed(messages):
-                if msg.get("role") == "devin" and msg.get("message", "").strip():
-                    db_session.plan = msg["message"].strip()
+                role = msg.get("role", "")
+                text = msg.get("message", "") or msg.get("content", "") or msg.get("text", "")
+                if role in ("devin", "assistant") and text.strip():
+                    db_session.plan = text.strip()
                     break
 
         pr_info = devin_data.get("pull_request")

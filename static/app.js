@@ -196,15 +196,15 @@ function renderSessions(scopeSessions) {
 
   listEl.innerHTML = scopeSessions
     .map((s) => {
-      const isRunning = s.status === "running" || s.status === "creating";
-      const isCompleted = s.status === "completed" || s.status === "done";
+      const isRunning = s.status === "running" || s.status === "creating" || s.status === "working";
+      const isCompleted = s.status === "finished" || s.status === "completed" || s.status === "done" || s.status === "blocked";
       const hasPlan = !!(s.plan && s.plan.trim());
       const hasConfidence = !!(s.confidence && s.confidence.trim());
 
       let statusHint = "";
       if (isRunning) statusHint = '<span class="status-hint">Devin is analyzing… click Refresh to check</span>';
-      else if (isCompleted && hasPlan) statusHint = '<span class="status-hint status-hint-ready">Plan ready — click Implement to proceed</span>';
-      else if (isCompleted && !hasPlan) statusHint = '<span class="status-hint">Completed but no plan returned. Try Refresh.</span>';
+      else if (hasPlan) statusHint = '<span class="status-hint status-hint-ready">Plan ready — click Implement to proceed</span>';
+      else if (isCompleted && !hasPlan) statusHint = '<span class="status-hint">Devin finished but plan not extracted yet. Click Refresh to try again.</span>';
 
       const outputContent = hasPlan || hasConfidence
         ? `
@@ -385,14 +385,14 @@ function renderImplementations(implementations) {
 
   listEl.innerHTML = implementations
     .map((s) => {
-      const isRunning = s.status === "running" || s.status === "creating";
-      const isCompleted = s.status === "completed" || s.status === "done";
+      const isRunning = s.status === "running" || s.status === "creating" || s.status === "working";
+      const isCompleted = s.status === "finished" || s.status === "completed" || s.status === "done" || s.status === "blocked";
       const hasPR = !!(s.pr_url && s.pr_url.trim());
 
       let statusHint = "";
       if (isRunning) statusHint = '<span class="status-hint">Devin is implementing… click Refresh to check</span>';
-      else if (isCompleted && hasPR) statusHint = '<span class="status-hint status-hint-ready">PR is ready!</span>';
-      else if (isCompleted && !hasPR) statusHint = '<span class="status-hint">Completed. Try Refresh to check for a PR link.</span>';
+      else if (hasPR) statusHint = '<span class="status-hint status-hint-ready">PR is ready!</span>';
+      else if (isCompleted && !hasPR) statusHint = '<span class="status-hint">Devin finished. Click Refresh to check for a PR link.</span>';
 
       return `
     <div class="session-card ${hasPR ? "session-card--has-pr" : ""}" data-session-id="${s.id}">
