@@ -260,9 +260,13 @@ function renderSessions(scopeSessions) {
       else if (hasPlan) statusHint = '<span class="status-hint status-hint-ready">Plan ready — click Implement to proceed</span>';
       else if (isCompleted && !hasPlan) statusHint = '<span class="status-hint">Devin finished but plan not extracted yet. Click Refresh to try again.</span>';
 
+      const confidenceBlock = hasConfidence
+        ? `<div class="devin-output-confidence"><span class="devin-output-label">Confidence:</span> <strong class="confidence-inline confidence-inline-${escapeHtml(s.confidence).toLowerCase()}">${escapeHtml(s.confidence).toUpperCase()}</strong></div>`
+        : '';
+
       const outputContent = hasPlan
-        ? renderPlanBlock(s.plan)
-        : '<p class="devin-output-empty">No output yet. Click <strong>Refresh</strong> to fetch the plan from Devin.</p>';
+        ? `${confidenceBlock}${renderPlanBlock(s.plan)}`
+        : confidenceBlock || '<p class="devin-output-empty">No output yet. Click <strong>Refresh</strong> to fetch the plan from Devin.</p>';
 
       return `
     <div class="session-card ${isCompleted && hasPlan ? "session-card--ready" : ""}" data-session-id="${s.id}">
@@ -274,7 +278,7 @@ function renderSessions(scopeSessions) {
             <span class="badge badge-type">scope</span>
             <span class="badge badge-status ${(s.status || "").toLowerCase()}">${escapeHtml(s.status)}</span>
           </div>
-          ${hasConfidence ? `<div class="confidence-display"><span class="confidence-label">Confidence:</span> <span class="confidence-value confidence-${escapeHtml(s.confidence).toLowerCase()}">${escapeHtml(s.confidence)}</span></div>` : ""}
+          ${hasConfidence ? `<div class="confidence-display confidence-display-${escapeHtml(s.confidence).toLowerCase()}"><span class="confidence-icon">${s.confidence.toLowerCase() === 'high' ? '&#9679;' : s.confidence.toLowerCase() === 'medium' ? '&#9679;' : '&#9679;'}</span><span class="confidence-label">Confidence:</span> <span class="confidence-value confidence-${escapeHtml(s.confidence).toLowerCase()}">${escapeHtml(s.confidence).toUpperCase()}</span></div>` : ""}
           ${statusHint}
           <div class="devin-output-block">
             <div class="devin-output-header">Devin Analysis</div>

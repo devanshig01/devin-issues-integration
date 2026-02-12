@@ -436,10 +436,11 @@ body {
 }
 
 .issue-title {
-  font-weight: 700;
+  font-weight: 800;
   margin: 0 0 0.35rem 0;
-  font-size: 1.0625rem;
+  font-size: 1.15rem;
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 .issue-title-text {
@@ -512,10 +513,11 @@ body {
 }
 
 .session-title {
-  font-weight: 700;
+  font-weight: 800;
   margin: 0 0 0.25rem 0;
-  font-size: 1.0625rem;
+  font-size: 1.15rem;
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 .session-title-number {
@@ -658,19 +660,6 @@ body {
   padding-top: 0.5rem;
 }
 
-.devin-output-confidence {
-  margin-bottom: 0.5rem;
-  font-size: 0.8125rem;
-}
-
-.devin-output-confidence .devin-output-label {
-  color: var(--text-muted);
-  margin-right: 0.35rem;
-}
-
-.devin-output-confidence:not(:empty) {
-  color: var(--success);
-}
 
 .devin-output-pr {
   display: inline-block;
@@ -982,23 +971,53 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(34, 211, 238, 0.06);
-  border: 1px solid rgba(34, 211, 238, 0.15);
+  margin-top: 0.75rem;
+  padding: 0.65rem 1rem;
   border-radius: var(--radius);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+}
+
+.confidence-display-high {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.confidence-display-medium {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.confidence-display-low {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.confidence-icon {
+  font-size: 0.625rem;
+}
+
+.confidence-display-high .confidence-icon {
+  color: var(--success);
+}
+
+.confidence-display-medium .confidence-icon {
+  color: var(--warning);
+}
+
+.confidence-display-low .confidence-icon {
+  color: var(--danger);
 }
 
 .confidence-label {
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .confidence-value {
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  font-size: 1rem;
 }
 
 .confidence-high {
@@ -1010,6 +1029,37 @@ body {
 }
 
 .confidence-low {
+  color: var(--danger);
+}
+
+.devin-output-confidence {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-hover);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.devin-output-confidence .devin-output-label {
+  color: var(--text-muted);
+  margin-right: 0.35rem;
+  font-weight: 500;
+}
+
+.confidence-inline {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.confidence-inline-high {
+  color: var(--success);
+}
+
+.confidence-inline-medium {
+  color: var(--warning);
+}
+
+.confidence-inline-low {
   color: var(--danger);
 }
 
