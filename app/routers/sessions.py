@@ -52,7 +52,11 @@ async def create_scope_session(
         f"Respond with:\n"
         f"1. A clear implementation plan\n"
         f"2. Confidence level (low/medium/high)\n"
-        f"Do NOT implement the changes - only provide the plan."
+        f"Do NOT implement the changes - only provide the plan.\n\n"
+        f"IMPORTANT: Please update the structured output with this JSON format "
+        f"whenever you have results:\n"
+        f'{{"plan": "your detailed step-by-step plan here", '
+        f'"confidence": "low/medium/high"}}'
     )
 
     db_session = DevinSession(
@@ -163,6 +167,19 @@ async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
                 db_session.pr_url = structured.get("pr_url", db_session.pr_url)
             elif isinstance(structured, str):
                 db_session.plan = structured
+
+        if not db_session.plan:
+            messages = devin_data.get("messages", [])
+            for msg in reversed(messages):
+                if msg.get("role") == "devin" and msg.get("message", "").strip():
+                    db_session.plan = msg["message"].strip()
+                    break
+
+        pr_info = devin_data.get("pull_request")
+        if pr_info and isinstance(pr_info, dict):
+            pr_url = pr_info.get("url", "")
+            if pr_url:
+                db_session.pr_url = pr_url
 
         await db.commit()
         await db.refresh(db_session)
