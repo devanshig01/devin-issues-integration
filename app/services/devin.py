@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import httpx
 
@@ -9,7 +9,7 @@ DEVIN_API_BASE = "https://api.devin.ai/v1"
 
 async def create_session(
     prompt: str,
-    structured_outputs: Dict[str, Any] | None = None,
+    structured_outputs: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     url = f"{DEVIN_API_BASE}/sessions"
     headers = {
