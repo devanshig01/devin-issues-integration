@@ -21,7 +21,7 @@ async def create_session(prompt: str) -> Dict[str, Any]:
 
 
 async def get_session(session_id: str) -> Dict[str, Any]:
-    url = f"{DEVIN_API_BASE}/session/{session_id}"
+    url = f"{DEVIN_API_BASE}/sessions/{session_id}"
     headers = {
         "Authorization": f"Bearer {settings.devin_api_token}",
     }
