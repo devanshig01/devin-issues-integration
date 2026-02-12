@@ -17,10 +17,14 @@ from app.services import devin, github
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
+_MARKDOWN_RE = re.compile(r"[*_#`>~\-]+")
+
 _CONFIDENCE_RE = re.compile(
-    r"(?:confidence\s*(?:level|score)?[\s:]*)(high|medium|low)",
+    r"confidence\s*(?:level|score)?[\s:]+(?:\*{0,2})(high|medium|low)",
     re.IGNORECASE,
 )
+
+_JSON_BLOCK_RE = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL)
 
 
 def _extract_confidence_from_text(text: str) -> Optional[str]:
@@ -34,6 +38,19 @@ def _extract_confidence_from_text(text: str) -> Optional[str]:
                 return val.strip().lower()
     except (json.JSONDecodeError, ValueError):
         pass
+    for block_match in _JSON_BLOCK_RE.finditer(text):
+        try:
+            data = json.loads(block_match.group(1))
+            if isinstance(data, dict):
+                val = data.get("confidence", "")
+                if val and val.strip().lower() in ("high", "medium", "low"):
+                    return val.strip().lower()
+        except (json.JSONDecodeError, ValueError):
+            pass
+    stripped = _MARKDOWN_RE.sub("", text)
+    m = _CONFIDENCE_RE.search(stripped)
+    if m:
+        return m.group(1).lower()
     m = _CONFIDENCE_RE.search(text)
     if m:
         return m.group(1).lower()
@@ -96,8 +113,15 @@ async def create_scope_session(
     await db.commit()
     await db.refresh(db_session)
 
+    structured_outputs = [
+        {
+            "plan": "detailed step-by-step implementation plan",
+            "confidence": "low, medium, or high",
+        }
+    ]
+
     try:
-        devin_resp = await devin.create_session(prompt)
+        devin_resp = await devin.create_session(prompt, structured_outputs=structured_outputs)
         db_session.devin_session_id = devin_resp.get("session_id", "")
         db_session.devin_session_url = devin_resp.get("url", "")
         db_session.status = "running"
