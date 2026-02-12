@@ -144,6 +144,38 @@ async def create_implement_session(
     return db_session
 
 
+@router.get("/{session_id}/debug")
+async def debug_session(session_id: int, db: AsyncSession = Depends(get_db)):
+    """Return the raw Devin API response for debugging plan extraction."""
+    result = await db.execute(
+        select(DevinSession).where(DevinSession.id == session_id)
+    )
+    db_session = result.scalar_one_or_none()
+    if not db_session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if not db_session.devin_session_id:
+        raise HTTPException(status_code=400, detail="No Devin session ID")
+    try:
+        devin_data = await devin.get_session(db_session.devin_session_id)
+        return {
+            "db_plan": db_session.plan,
+            "db_confidence": db_session.confidence,
+            "db_status": db_session.status,
+            "devin_status_enum": devin_data.get("status_enum"),
+            "devin_structured_output": devin_data.get("structured_output"),
+            "devin_structured_output_type": type(devin_data.get("structured_output")).__name__,
+            "devin_messages_count": len(devin_data.get("messages", [])),
+            "devin_messages": [
+                {"role": m.get("role"), "message_preview": (m.get("message", "") or m.get("content", "") or m.get("text", ""))[:300]}
+                for m in devin_data.get("messages", [])
+            ],
+            "devin_pull_request": devin_data.get("pull_request"),
+            "devin_all_keys": list(devin_data.keys()),
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
 @router.post("/{session_id}/refresh", response_model=SessionResponse)
 async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
