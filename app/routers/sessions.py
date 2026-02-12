@@ -225,16 +225,12 @@ async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
 
         if not db_session.plan:
             messages = devin_data.get("messages", [])
-            logger.info("Messages count: %d", len(messages))
-            if messages:
-                logger.info("Last message keys: %s", list(messages[-1].keys()) if messages[-1] else "empty")
-                logger.info("Last message role: %s", messages[-1].get("role", "N/A"))
-            for msg in reversed(messages):
-                role = msg.get("role", "")
-                text = msg.get("message", "") or msg.get("content", "") or msg.get("text", "")
-                if role in ("devin", "assistant") and text.strip():
-                    db_session.plan = text.strip()
-                    break
+            if len(messages) >= 2:
+                for msg in reversed(messages[1:]):
+                    text = msg.get("message", "") or msg.get("content", "") or msg.get("text", "")
+                    if text.strip():
+                        db_session.plan = text.strip()
+                        break
 
         pr_info = devin_data.get("pull_request")
         if pr_info and isinstance(pr_info, dict):
