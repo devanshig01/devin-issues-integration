@@ -5,6 +5,20 @@ let currentStep = 1;
 let issues = [];
 let sessions = [];
 
+function getPinnedIssues() {
+  try { return JSON.parse(localStorage.getItem("pinnedIssues") || "[]"); } catch { return []; }
+}
+function setPinnedIssues(arr) {
+  localStorage.setItem("pinnedIssues", JSON.stringify(arr));
+}
+function togglePin(issueNumber) {
+  const pinned = getPinnedIssues();
+  const idx = pinned.indexOf(issueNumber);
+  if (idx >= 0) pinned.splice(idx, 1); else pinned.push(issueNumber);
+  setPinnedIssues(pinned);
+  renderIssues();
+}
+
 const $ = (id) => document.getElementById(id);
 const qs = (sel, el = document) => el.querySelector(sel);
 const qsAll = (sel, el = document) => el.querySelectorAll(sel);
@@ -27,21 +41,28 @@ function goToStep(step) {
   if (step === 3) loadImplementations();
 }
 
+function renderMarkdown(text) {
+  if (!text) return "";
+  if (typeof marked !== "undefined" && marked.parse) {
+    return marked.parse(text);
+  }
+  return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
 function renderPlanBlock(plan) {
   if (!plan) return "";
   const needsExpand = plan.length > PLAN_PREVIEW_LEN;
-  const preview = truncate(plan, PLAN_PREVIEW_LEN);
-  const previewEscaped = escapeHtml(preview);
-  const fullEscaped = escapeHtml(plan);
+  const previewHtml = renderMarkdown(truncate(plan, PLAN_PREVIEW_LEN));
+  const fullHtml = renderMarkdown(plan);
   return `
     <div class="session-plan-block" data-expanded="false">
       <div class="plan-header">
         <span class="plan-label">Plan</span>
         ${needsExpand ? '<button type="button" class="btn btn-ghost plan-expand-btn" aria-label="Expand plan">Expand</button>' : ""}
       </div>
-      <div class="session-plan-content">
-        <div class="session-plan-preview">${previewEscaped}</div>
-        ${needsExpand ? `<div class="session-plan-full hidden">${fullEscaped}</div>` : ""}
+      <div class="session-plan-content markdown-body">
+        <div class="session-plan-preview">${previewHtml}</div>
+        ${needsExpand ? `<div class="session-plan-full hidden">${fullHtml}</div>` : ""}
       </div>
     </div>
   `;
@@ -112,12 +133,23 @@ function renderIssues() {
     return;
   }
 
-  listEl.innerHTML = issues
-    .map((issue) => `
-    <div class="issue-card" data-number="${issue.number}">
+  const pinned = getPinnedIssues();
+  const sorted = [...issues].sort((a, b) => {
+    const ap = pinned.includes(a.number) ? 0 : 1;
+    const bp = pinned.includes(b.number) ? 0 : 1;
+    return ap - bp;
+  });
+
+  listEl.innerHTML = sorted
+    .map((issue) => {
+      const isPinned = pinned.includes(issue.number);
+      return `
+    <div class="issue-card ${isPinned ? "issue-card--pinned" : ""}" data-number="${issue.number}">
       <div class="issue-main">
         <div class="issue-header-row">
+          <button type="button" class="pin-btn ${isPinned ? "pinned" : ""}" data-number="${issue.number}" title="${isPinned ? "Unpin" : "Pin as priority"}">${isPinned ? "&#9733;" : "&#9734;"}</button>
           <span class="issue-number-badge">#${issue.number}</span>
+          ${isPinned ? '<span class="pinned-label">Priority</span>' : ""}
         </div>
         <h3 class="issue-title">${escapeHtml(issue.title)}</h3>
         <div class="issue-meta">
@@ -130,11 +162,15 @@ function renderIssues() {
         <button type="button" class="btn btn-primary scope-btn" data-number="${issue.number}">Scope with Devin</button>
       </div>
     </div>
-  `)
+  `;
+    })
     .join("");
 
   listEl.querySelectorAll(".scope-btn").forEach((btn) => {
     btn.addEventListener("click", () => scopeIssue(Number(btn.dataset.number)));
+  });
+  listEl.querySelectorAll(".pin-btn").forEach((btn) => {
+    btn.addEventListener("click", () => togglePin(Number(btn.dataset.number)));
   });
 }
 
@@ -289,7 +325,7 @@ function openImplementPlanModal(scopeSessionId) {
     }
   }
   if (scopeSession.plan && scopeSession.plan.trim()) {
-    planEl.textContent = scopeSession.plan;
+    planEl.innerHTML = renderMarkdown(scopeSession.plan);
     planEl.classList.remove("hidden");
     if (noPlan) noPlan.classList.add("hidden");
   } else {
@@ -394,6 +430,8 @@ function renderImplementations(implementations) {
       else if (hasPR) statusHint = '<span class="status-hint status-hint-ready">PR is ready!</span>';
       else if (isCompleted && !hasPR) statusHint = '<span class="status-hint">Devin finished. Click Refresh to check for a PR link.</span>';
 
+      const issueUrl = s.issue_number ? `https://github.com/${encodeURIComponent(document.querySelector('.logo')?.dataset?.repo || '')}/issues/${s.issue_number}` : '';
+
       return `
     <div class="session-card ${hasPR ? "session-card--has-pr" : ""}" data-session-id="${s.id}">
       <div class="session-row">
@@ -407,10 +445,12 @@ function renderImplementations(implementations) {
           </div>
           ${statusHint}
           ${hasPR ? `<div class="pr-link-block"><a href="${escapeHtml(s.pr_url)}" target="_blank" rel="noopener" class="btn btn-primary">Open Pull Request</a></div>` : ""}
+          ${isCompleted && !hasPR ? `<div class="pr-link-block"><span class="status-hint">No PR detected yet. Click Refresh or check Devin session.</span></div>` : ""}
         </div>
         <div class="session-actions">
           ${s.devin_session_url ? `<a href="${escapeHtml(s.devin_session_url)}" target="_blank" rel="noopener" class="btn btn-ghost">Open Devin</a>` : ""}
           <button type="button" class="btn btn-secondary refresh-session-btn" data-id="${s.id}">Refresh</button>
+          <button type="button" class="btn btn-ghost" onclick="goToStep(1)">Back to Issues</button>
         </div>
       </div>
     </div>
