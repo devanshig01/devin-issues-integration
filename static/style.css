@@ -1013,6 +1013,48 @@ body {
   color: var(--danger);
 }
 
+.issue-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.issue-status--scoped {
+  color: var(--accent);
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+}
+
+.issue-status--scoped::before {
+  content: "\01F50D";
+}
+
+.issue-status--implementing {
+  color: var(--warning);
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.issue-status--implementing::before {
+  content: "\02699\0FE0F";
+}
+
+.issue-status--pr {
+  color: var(--success);
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.issue-status--pr::before {
+  content: "\02705";
+}
+
 .pinned-label {
   font-size: 0.6875rem;
   font-weight: 600;

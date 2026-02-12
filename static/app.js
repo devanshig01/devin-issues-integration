@@ -105,6 +105,18 @@ async function api(path, options = {}) {
   return res.json();
 }
 
+function getIssueStatus(issueNumber) {
+  const issueSessions = sessions.filter((s) => s.issue_number === issueNumber);
+  const impl = issueSessions.find((s) => s.session_type === "implement");
+  if (impl) {
+    if (impl.pr_url && impl.pr_url.trim()) return { label: "PR Opened", cls: "issue-status--pr" };
+    return { label: "Implementing", cls: "issue-status--implementing" };
+  }
+  const scope = issueSessions.find((s) => s.session_type === "scope");
+  if (scope) return { label: "Scoped", cls: "issue-status--scoped" };
+  return null;
+}
+
 async function loadIssues() {
   const listEl = $("issues-list");
   const loadingEl = $("issues-loading");
@@ -115,7 +127,12 @@ async function loadIssues() {
   show(loadingEl, true);
 
   try {
-    issues = await api(`/issues?state=${issuesState}`);
+    const [issuesData, sessionsData] = await Promise.all([
+      api(`/issues?state=${issuesState}`),
+      api("/sessions").catch(() => []),
+    ]);
+    issues = issuesData;
+    sessions = sessionsData;
     renderIssues();
     show(loadingEl, false);
     show(listEl, true);
@@ -157,6 +174,7 @@ function renderIssues() {
           · ${formatDate(issue.created_at)}
         </div>
         ${issue.labels?.length ? `<div class="issue-labels">${issue.labels.map((l) => `<span class="label">${escapeHtml(l)}</span>`).join("")}</div>` : ""}
+        ${(() => { const st = getIssueStatus(issue.number); return st ? `<div class="issue-status ${st.cls}">${st.label}</div>` : ""; })()}
       </div>
       <div class="issue-actions">
         <button type="button" class="btn btn-primary scope-btn" data-number="${issue.number}">Scope with Devin</button>
