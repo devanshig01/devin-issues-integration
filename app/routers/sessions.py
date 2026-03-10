@@ -151,6 +151,11 @@ async def create_implement_session(
         raise HTTPException(
             status_code=400, detail="Referenced session is not a scope session"
         )
+    if scope_session.status != "finished":
+        raise HTTPException(
+            status_code=400,
+            detail="Scope session is not yet finished. Wait for the scope session to complete before implementing.",
+        )
 
     plan_text = scope_session.plan or "No plan available yet from the scope session."
 
@@ -245,12 +250,7 @@ async def refresh_session(session_id: int, db: AsyncSession = Depends(get_db)):
                      repr(devin_data.get("structured_output"))[:500])
 
         status = devin_data.get("status_enum", db_session.status)
-        if status == "blocked" and db_session.session_type == "scope":
-            db_session.status = "finished"
-        elif status == "finished":
-            db_session.status = "finished"
-        else:
-            db_session.status = status
+        db_session.status = status
 
         structured = devin_data.get("structured_output")
         if structured and isinstance(structured, str):
